@@ -98,15 +98,16 @@ class HandSpeedTracker:
             time_difference = 1 
             return distance / time_difference
         
-    # function to plot the speed of a hand
-    def plot_speed(self, speed_list, hand, name):
-        plt.plot(speed_list)
-        plt.title("Speed of the " + hand + " hand")
+    # function to plot the speed of both hands
+    def plot_speed(self, speed_list, name):
+        plt.title("Speed of the hands - " + name)
         plt.xlabel("Time")
         plt.ylabel("Speed")
-
-        # save the plot
-        plt.savefig(name + "_" + hand + "_hand_speed.png")
+        plt.plot(speed_list["left_hand"], label="Left hand")
+        plt.plot(speed_list["right_hand"], label="Right hand")
+        plt.legend()
+        plt.savefig(name + ".png")
+        plt.show()
 
     # function to save the coordinates and speed of left and right hand in an excel file
     def save_results(self, file_name, coordinates, speed_list):

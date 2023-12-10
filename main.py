@@ -46,8 +46,12 @@ def choose_video_file():
         while cap.isOpened():
             success, image = cap.read() # reading the image from the webcam
             if not success:
-                print("Ignoring empty video frame.")
-                continue
+                hand_speed_tracker.plot_speed(speed_list, video_name)
+                hand_speed_tracker.save_results(video_name + ".xlsx", coordinates, speed_list)
+                hand_speed_tracker.close()
+                cap.release()
+                cv2.destroyAllWindows()
+                break
             
             image, coordinates = hand_speed_tracker.find_hands(image)
             left_hand_speed = hand_speed_tracker.calculate_speed(coordinates["left_hand"])
@@ -58,8 +62,7 @@ def choose_video_file():
 
             key = cv2.waitKey(1)
             if key == ord('s'):
-                hand_speed_tracker.plot_speed(speed_list["left_hand"], "left", video_name)
-                hand_speed_tracker.plot_speed(speed_list["right_hand"], "right", video_name)
+                hand_speed_tracker.plot_speed(speed_list, video_name)
                 hand_speed_tracker.save_results(video_name + ".xlsx", coordinates, speed_list)
                 hand_speed_tracker.close()
                 cap.release()
