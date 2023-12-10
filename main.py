@@ -62,7 +62,15 @@ def choose_video_file():
             hand_speed_tracker.save_results(video_name + ".xlsx", coordinates, speed_list)
             hand_speed_tracker.close()
             cap.release()
+            cv2.destroyAllWindows()
             break
+
+def quit():
+    window.quit()
+    window.destroy()
+
+# Bind the window with the quit function
+window.protocol("WM_DELETE_WINDOW", quit)
 
 # Run the window
 window.mainloop()
