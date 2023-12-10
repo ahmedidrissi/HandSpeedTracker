@@ -27,7 +27,8 @@ window.columnconfigure([0, 1, 2, 3, 4, 5], weight=1)
 def choose_video_file():
     # get the path of the video file
     video_path = filedialog.askopenfilename(initialdir=os.getcwd(), title="Select a video file", filetypes=[("Video files", "*.mp4;*.avi;*.mkv")])
-    video_name = os.path.basename(video_path)
+    # get the name of the video file without the extension
+    video_name = os.path.splitext(os.path.basename(video_path))[0]
     # create a video capture object
     cap = cv2.VideoCapture(video_path)
     # fix the width and height of the video to 640 and 480
@@ -59,6 +60,8 @@ def choose_video_file():
             hand_speed_tracker.plot_speed(speed_list["left_hand"], "left", video_name)
             hand_speed_tracker.plot_speed(speed_list["right_hand"], "right", video_name)
             hand_speed_tracker.save_results(video_name + ".xlsx", coordinates, speed_list)
+            hand_speed_tracker.close()
+            cap.release()
             break
 
 # Run the window
