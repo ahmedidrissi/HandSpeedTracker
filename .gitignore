@@ -1,3 +1,6 @@
 __pycache__/
 video.*
 video_*
+build/
+main.exe
+main.spec
