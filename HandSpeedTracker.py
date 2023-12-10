@@ -59,12 +59,14 @@ class HandSpeedTracker:
                 x_left, y_left, z_left = left_hand.landmark[8].x, left_hand.landmark[8].y, left_hand.landmark[8].z
                 self.coordinates["left_hand"].append((x_left, y_left, z_left))
                 cv2.circle(image, (int(x_left * image.shape[1]), int(y_left * image.shape[0])), 10, (255, 0, 0), -1)
+                print("Left hand: ", x_left, y_left, z_left)
 
             # Get the right hand landmark and draw a red circle
             if right_hand:
                 x_right, y_right, z_right = right_hand.landmark[8].x, right_hand.landmark[8].y, right_hand.landmark[8].z
                 self.coordinates["right_hand"].append((x_right, y_right, z_right))
                 cv2.circle(image, (int(x_right * image.shape[1]), int(y_right * image.shape[0])), 10, (0, 0, 255), -1)
+                print("Right hand: ", x_right, y_right, z_right)
 
             # If one hand is detected, the coordinates of the other hand are set to a list of null values
             if left_hand and not right_hand:
@@ -78,7 +80,7 @@ class HandSpeedTracker:
             self.coordinates["right_hand"].append((0, 0, 0))
                 
         # Flip the image back
-        image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+        image = cv2.cvtColor(cv2.flip(image, 1), cv2.COLOR_RGB2BGR)
 
         return image, self.coordinates
     
@@ -100,13 +102,17 @@ class HandSpeedTracker:
         
     # function to plot the speed of both hands
     def plot_speed(self, speed_list, name):
-        plt.title("Speed of the hands - " + name)
+        plt.title("Speed of the left hand - " + name)
         plt.xlabel("Time")
         plt.ylabel("Speed")
-        plt.plot(speed_list["left_hand"], label="Left hand")
-        plt.plot(speed_list["right_hand"], label="Right hand")
-        plt.legend()
-        plt.savefig(name + ".png")
+        plt.plot(speed_list["left_hand"])
+        plt.savefig(name + "_left.png")
+        plt.show()
+        plt.title("Speed of the right hand - " + name)
+        plt.xlabel("Time")
+        plt.ylabel("Speed")
+        plt.plot(speed_list["right_hand"])
+        plt.savefig(name + "_right.png")
         plt.show()
 
     # function to save the coordinates and speed of left and right hand in an excel file
