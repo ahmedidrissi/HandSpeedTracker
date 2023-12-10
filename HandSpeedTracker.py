@@ -1,6 +1,7 @@
 import cv2
 import mediapipe as mp
 import matplotlib.pyplot as plt
+import pandas as pd
 
 class HandSpeedTracker:
     def __init__(self, mode=False, max_hands=2, detection_confidence=0.5, tracking_confidence=0.5):
@@ -98,65 +99,25 @@ class HandSpeedTracker:
             return distance / time_difference
         
     # function to plot the speed of a hand
-    def plot_speed(self, speed_list, hand):
+    def plot_speed(self, speed_list, hand, name):
         plt.plot(speed_list)
         plt.title("Speed of the " + hand + " hand")
         plt.xlabel("Time")
         plt.ylabel("Speed")
 
         # save the plot
-        plt.savefig("speed_" + hand + "_hand.png")
+        plt.savefig(name + "_" + hand + "_hand_speed.png")
 
-        # show the plot
-        plt.show()
-
-    # function to save the coordinates of left and right hand in a csv file
-    def save_coordinates(self, file_name, coordinates):
+    # function to save the coordinates and speed of left and right hand in an excel file
+    def save_results(self, file_name, coordinates, speed_list):
         # coordinates is a dictionary with the keys "left_hand" and "right_hand"
+        # speed_list is a dictionary with the keys "left_hand" and "right_hand"
         
-        # create a csv file
-        with open(file_name, "w") as file:
-            file.write("x_left, y_left, z_left, x_right, y_right, z_right\n")
-            for i in range(len(coordinates["left_hand"])):
-                x_left, y_left, z_left = coordinates["left_hand"][i]
-                x_right, y_right, z_right = coordinates["right_hand"][i]
-                file.write(str(x_left) + ", " + str(y_left) + ", " + str(z_left) + ", " + str(x_right) + ", " + str(y_right) + ", " + str(z_right) + "\n")
-
-
-
-if __name__ == "__main__":
-
-    # get a video file
-    video_path = "video.mp4"
-    cap = cv2.VideoCapture(video_path)
-    # fix the width and height of the video to 640 and 480
-    cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-    cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-    # set the frame rate to 30
-    cap.set(cv2.CAP_PROP_FPS, 30)
-
-    hand_speed_tracker = HandSpeedTracker()
-    speed_list = {
-        "left_hand": [],
-        "right_hand": []
-    }
-    while cap.isOpened():
-        success, image = cap.read() # reading the image from the webcam
-        if not success:
-            print("Ignoring empty video frame.")
-            continue
-        
-        image, coordinates = hand_speed_tracker.find_hands(image)
-        left_hand_speed = hand_speed_tracker.calculate_speed(coordinates["left_hand"])
-        right_hand_speed = hand_speed_tracker.calculate_speed(coordinates["right_hand"])
-        speed_list["left_hand"].append(left_hand_speed)
-        speed_list["right_hand"].append(right_hand_speed)
-        cv2.imshow("Hand Tracker", image)
-
-        key = cv2.waitKey(1)
-        if key == ord('s'):
-            hand_speed_tracker.plot_speed(speed_list["left_hand"], "left")
-            hand_speed_tracker.plot_speed(speed_list["right_hand"], "right")
-            hand_speed_tracker.save_coordinates("coordinates.csv", coordinates)
-            hand_speed_tracker.close()
-            break
+        # create a dataframe
+        df1 = pd.DataFrame(coordinates["left_hand"], columns=["x_left", "y_left", "z_left"])
+        df2 = pd.DataFrame(speed_list["left_hand"], columns=["speed_left"])
+        df3 = pd.DataFrame(coordinates["right_hand"], columns=["x_right", "y_right", "z_right"])
+        df4 = pd.DataFrame(speed_list["right_hand"], columns=["speed_right"])
+        df = pd.concat([df1, df2, df3, df4], axis=1)
+        # save the dataframe in an excel file
+        df.to_excel(file_name, index=False)
